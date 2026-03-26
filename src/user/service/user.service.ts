@@ -13,7 +13,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { CreateUserDTO, UserResponseDTO } from '@/user/dto/user.dto';
+import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '@/user/dto/user.dto';
 import { User, UserDocument } from '@/user/schemas/user.schema';
 
 @Injectable()
@@ -50,12 +50,14 @@ export class UserService {
     return user.map((user) => this.responseDTO(user));
   }
 
-  async findById(id: string) {
-    const userExists = await this.userModel.findById(id);
+  async findById(id: string): Promise<UserResponseDTO> {
+    const user = await this.userModel.findById(id);
 
-    if (!userExists) {
-      throw new NotFoundException('Uusáriop não encontrado,');
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
     }
+
+    return new UserResponseDTO(user);
   }
 
   async findByEmail(email: string) {
@@ -64,18 +66,20 @@ export class UserService {
     if (!userExists) {
       throw new NotFoundException('Usuário não encontrado.');
     }
+
+    return userExists;
   }
 
-  async update(id: string, @Body() dto: CreateUserDTO) {
-    const user = await this.userModel.findByIdAndUpdate(id, dto, {
+  async update(id: string, data: UpdateUserDTO): Promise<UserResponseDTO> {
+    const user = await this.userModel.findByIdAndUpdate(id, data, {
       new: true,
     });
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
-    return this.responseDTO(user);
+    return new UserResponseDTO(user);
   }
 
   @Delete()
