@@ -5,7 +5,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { BadRequestException, Body, Delete, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Delete,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { CreateUserDTO, UserResponseDTO } from '@/user/dto/user.dto';
 import { User, UserDocument } from '@/user/schemas/user.schema';
@@ -38,26 +44,46 @@ export class UserService {
     }
   }
 
-  async findAll() {
-    return this.userModel.find();
+  async findAll(): Promise<UserResponseDTO[]> {
+    const user = await this.userModel.find();
+
+    return user.map((user) => this.responseDTO(user));
   }
 
   async findById(id: string) {
-    return this.userModel.findById(id);
+    const userExists = await this.userModel.findById(id);
+
+    if (!userExists) {
+      throw new NotFoundException('Uusáriop não encontrado,');
+    }
   }
 
   async findByEmail(email: string) {
-    return this.userModel.findOne({ email });
+    const userExists = await this.userModel.findOne({ email });
+
+    if (!userExists) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
   }
 
   async update(id: string, @Body() dto: CreateUserDTO) {
-    return this.userModel.findByIdAndUpdate(id, dto, {
+    const user = await this.userModel.findByIdAndUpdate(id, dto, {
       new: true,
     });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    return this.responseDTO(user);
   }
 
   @Delete()
   async delete(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+    const userExists = await this.userModel.findByIdAndDelete(id);
+
+    if (!userExists) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
   }
 }
