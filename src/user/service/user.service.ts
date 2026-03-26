@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Body, Delete, Injectable } from '@nestjs/common';
+import { BadRequestException, Body, Delete, Injectable } from '@nestjs/common';
 
 import { CreateUserDTO } from '@/user/dto/user.dto';
 import { User, UserDocument } from '@/user/schemas/user.schema';
@@ -17,8 +17,13 @@ export class UserService {
   ) {}
 
   async create(dto: CreateUserDTO) {
+    const userExists = await this.userModel.findOne({ email: dto.email });
+
+    if (userExists) {
+      throw new BadRequestException('E-mail já está em uso.');
+    }
+
     const user = await this.userModel.create(dto);
-    console.log('DATA: ', dto);
     return user;
   }
 
