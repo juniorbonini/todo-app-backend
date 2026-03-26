@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   Body,
@@ -8,8 +10,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { UserService } from '../service/user.service';
-import { CreateUserDTO } from '../dto/user.dto';
+
+import { CreateUserDTO } from '@/user/dto/user.dto';
+import { UserService } from '@/user/service/user.service';
 
 @Controller('users')
 export class UserController {

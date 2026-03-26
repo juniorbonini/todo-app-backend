@@ -1,60 +1,47 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Body, Delete, Injectable } from '@nestjs/common';
+
 import { CreateUserDTO } from '@/user/dto/user.dto';
+import { User, UserDocument } from '@/user/schemas/user.schema';
 
 @Injectable()
 export class UserService {
-  create(@Body() dto: CreateUserDTO) {
-    return {
-      id: '1',
-      ...dto,
-      createdAt: new Date(),
-    };
+  constructor(
+    @InjectModel(User.name)
+    private userModel: Model<UserDocument>,
+  ) {}
+
+  async create(dto: CreateUserDTO) {
+    const user = await this.userModel.create(dto);
+    console.log('DATA: ', dto);
+    return user;
   }
 
-  findAll() {
-    return [
-      {
-        id: '1',
-        name: 'Junior Bonini',
-        email: 'juniorbonini@email.com',
-      },
-      {
-        id: '2',
-        name: 'Lua Bonini',
-        email: 'luabonini@email.com',
-      },
-    ];
+  async findAll() {
+    return this.userModel.find();
   }
 
-  findById(id: string) {
-    return {
-      id,
-      name: 'Lua Bonini',
-      email: 'luabonini@email.com',
-    };
+  async findById(id: string) {
+    return this.userModel.findById(id);
   }
 
-  findByEmail(email: string) {
-    return {
-      id: '1',
-      name: 'Junior Bonini',
-      email,
-    };
+  async findByEmail(email: string) {
+    return this.userModel.findOne({ email });
   }
 
-  update(id: string, @Body() dto: CreateUserDTO) {
-    return {
-      id,
-      ...dto,
-      updatedAt: new Date(),
-    };
+  async update(id: string, @Body() dto: CreateUserDTO) {
+    return this.userModel.findByIdAndUpdate(id, dto, {
+      new: true,
+    });
   }
 
   @Delete()
-  delete(id: string) {
-    return {
-      message: `Usuário ${id} removido com sucesso`,
-    };
+  async delete(id: string) {
+    return this.userModel.findByIdAndDelete(id);
   }
 }
