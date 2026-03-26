@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   Body,
   Controller,
@@ -7,66 +8,40 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { UserService } from '../service/user.service';
 import { CreateUserDTO } from '../dto/user.dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
-  @Post('/users')
+  constructor(private userService: UserService) {}
+
+  @Post()
   create(@Body() dto: CreateUserDTO) {
-    return {
-      id: '1',
-      ...dto,
-      createdAt: new Date(),
-    };
+    return this.userService.create(dto);
   }
 
   @Get()
   findAll() {
-    return [
-      {
-        id: '1',
-        name: 'Junior Bonini',
-        email: 'juniorbonini@email.com',
-      },
-      {
-        id: '2',
-        name: 'Lua Bonini',
-        email: 'luabonini@email.com',
-      },
-    ];
+    return this.userService.findAll();
   }
 
   @Get(':id')
   findById(@Param('id') id: string) {
-    return {
-      id,
-      name: 'Lua Bonini',
-      email: 'luabonini@email.com',
-    };
+    return this.userService.findById(id);
   }
 
-  @Get('email/:email')
+  @Get(':email')
   findByEmail(@Param('email') email: string) {
-    return {
-      id: '1',
-      name: 'Junior Bonini',
-      email,
-    };
+    return this.userService.findByEmail(email);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: CreateUserDTO) {
-    return {
-      id,
-      ...dto,
-      updatedAt: new Date(),
-    };
+    return this.userService.update(id, dto);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string) {
-    return {
-      message: `Usuário ${id} removido com sucesso`,
-    };
+    return this.userService.delete(id);
   }
 }
