@@ -1,19 +1,20 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   BadRequestException,
-  Body,
-  Delete,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
-import { CreateUserDTO, UpdateUserDTO, UserResponseDTO } from '@/user/dto/user.dto';
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  UserResponseDTO,
+} from '@/user/dto/user.dto';
 import { User, UserDocument } from '@/user/schemas/user.schema';
 
 @Injectable()
@@ -60,33 +61,39 @@ export class UserService {
     return new UserResponseDTO(user);
   }
 
-  async findByEmail(email: string) {
-    const userExists = await this.userModel.findOne({ email });
-
-    if (!userExists) {
-      throw new NotFoundException('Usuário não encontrado.');
-    }
-
-    return userExists;
-  }
-
-  async update(id: string, data: UpdateUserDTO): Promise<UserResponseDTO> {
-    const user = await this.userModel.findByIdAndUpdate(id, data, {
-      new: true,
-    });
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    const user = await this.userModel.findOne({ email });
 
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');
     }
 
-    return new UserResponseDTO(user);
+    return user;
   }
 
-  @Delete()
-  async delete(id: string) {
-    const userExists = await this.userModel.findByIdAndDelete(id);
+  async update(id: string, dto: UpdateUserDTO): Promise<UserResponseDTO> {
+    try {
+      const user = await this.userModel.findByIdAndUpdate(id, dto, {
+        new: true,
+      });
 
-    if (!userExists) {
+      if (!user) {
+        throw new NotFoundException('Usuário não encontrado.');
+      }
+
+      return new UserResponseDTO(user);
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException('E-mail já está em uso.');
+      }
+      return error;
+    }
+  }
+
+  async delete(id: string): Promise<void> {
+    const result = await this.userModel.findByIdAndDelete(id);
+
+    if (!result) {
       throw new NotFoundException('Usuário não encontrado.');
     }
   }

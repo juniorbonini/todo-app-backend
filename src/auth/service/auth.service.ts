@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { UserService } from '@/user/service/user.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 
