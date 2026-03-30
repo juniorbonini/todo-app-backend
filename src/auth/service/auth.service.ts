@@ -1,5 +1,7 @@
-import { UserService } from '@/user/service/user.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+
+import { UserResponseDTO } from '@/user/dto/user.dto';
+import { UserService } from '@/user/service/user.service';
 
 @Injectable()
 export class AuthService {
@@ -15,5 +17,7 @@ export class AuthService {
     if (user.password !== password) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
+
+    return new UserResponseDTO(user);
   }
 }
