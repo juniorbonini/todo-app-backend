@@ -16,6 +16,7 @@ import {
   UserResponseDTO,
 } from '@/user/dto/user.dto';
 import { User, UserDocument } from '@/user/schemas/user.schema';
+import { RegisterDTO } from '@/auth/dto/register.dto';
 
 @Injectable()
 export class UserService {
@@ -87,6 +88,36 @@ export class UserService {
         throw new BadRequestException('E-mail já está em uso.');
       }
       return error;
+    }
+  }
+
+  async register(registerDTO: RegisterDTO): Promise<UserResponseDTO> {
+    const { name, email, password, confirmPassword, birthDate, age, gender } =
+      registerDTO;
+
+    if (password !== confirmPassword) {
+      throw new BadRequestException('As senhas não coincidem.');
+    }
+
+    try {
+      const user = new this.userModel({
+        name,
+        email,
+        password,
+        birthDate,
+        age,
+        gender,
+      });
+
+      const savedUser = await user.save();
+
+      return new UserResponseDTO(savedUser);
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException('E-mail já está em uso.');
+      }
+
+      throw error;
     }
   }
 

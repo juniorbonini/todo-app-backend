@@ -10,6 +10,7 @@ import {
 
 import { CreateUserDTO, UpdateUserDTO } from '@/user/dto/user.dto';
 import { UserService } from '@/user/service/user.service';
+import { RegisterDTO } from '@/auth/dto/register.dto';
 
 @Controller('users')
 export class UserController {
@@ -38,6 +39,11 @@ export class UserController {
   @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateUserDTO) {
     return this.userService.update(id, dto);
+  }
+
+  @Post('register')
+  register(@Body() registerDTO: RegisterDTO) {
+    return this.userService.register(registerDTO);
   }
 
   @Delete(':id')

@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { IsNotEmpty, IsEmail, IsDate, IsNumber } from 'class-validator';
 
 export class RegisterDTO {
@@ -15,6 +16,7 @@ export class RegisterDTO {
   confirmPassword: string;
 
   @IsNotEmpty({ message: 'A data de nascimento é obrigatória' })
+  @Type(() => Date)
   @IsDate({ message: 'Data de nascimento inválida' })
   birthDate: Date;
 
@@ -23,5 +25,6 @@ export class RegisterDTO {
 
   @IsNotEmpty({ message: 'A idade é obrigatória' })
   @IsNumber({}, { message: 'Idade inválida' })
+  @Type(() => Number)
   age: number;
 }
