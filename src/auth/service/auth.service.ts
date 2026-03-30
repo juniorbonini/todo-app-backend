@@ -20,4 +20,19 @@ export class AuthService {
 
     return new UserResponseDTO(user);
   }
+  async login(email: string, password: string): Promise<UserResponseDTO> {
+    await this.validateUser(email, password);
+
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    if (user.password !== password) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+
+    return new UserResponseDTO(user);
+  }
 }
