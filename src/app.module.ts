@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { AuthModule } from '@/auth/auth.module';
 import { UserModule } from '@/user/user.module';
+import { TaskModule } from './task/task.module';
 
 const URI =
   'mongodb+srv://todo-app:todoappapplication@todoapp.yle10an.mongodb.net/';
@@ -18,6 +19,7 @@ const URI =
     }),
     UserModule,
     AuthModule,
+    TaskModule,
   ],
   providers: [JwtService],
 })
