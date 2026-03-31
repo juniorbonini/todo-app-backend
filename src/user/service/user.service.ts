@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import {
@@ -92,21 +93,19 @@ export class UserService {
   }
 
   async register(registerDTO: RegisterDTO): Promise<UserResponseDTO> {
-    const { name, email, password, confirmPassword, birthDate, age, gender } =
-      registerDTO;
+    const { password, confirmPassword, ...userData } = registerDTO;
 
     if (password !== confirmPassword) {
       throw new BadRequestException('As senhas não coincidem.');
     }
 
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     try {
       const user = new this.userModel({
-        name,
-        email,
-        password,
-        birthDate,
-        age,
-        gender,
+        ...userData,
+        password: hashedPassword,
       });
 
       const savedUser = await user.save();
@@ -116,7 +115,6 @@ export class UserService {
       if (error.code === 11000) {
         throw new BadRequestException('E-mail já está em uso.');
       }
-
       throw error;
     }
   }
