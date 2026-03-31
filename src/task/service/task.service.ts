@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTaskDTO } from '../dto/task.dto';
@@ -22,5 +22,30 @@ export class TaskService {
 
   async findAllByUserId(userId: string): Promise<Task[]> {
     return this.taskModel.find({ userId }).exec();
+  }
+
+  async toggleStatus(taskId: string, userId: string): Promise<Task> {
+    const task = await this.taskModel.findOne({ _id: taskId, userId });
+
+    if (!task) {
+      throw new NotFoundException(
+        'Tarefa não encontrada ou você não tem permissão',
+      );
+    }
+
+    task.isCompleted = !task.isCompleted;
+    return task.save();
+  }
+
+  async remove(taskId: string, userId: string) {
+    const result = await this.taskModel.deleteOne({ _id: taskId, userId });
+
+    if (result.deletedCount === 0) {
+      throw new NotFoundException(
+        'Tarefa não encontrada ou você não tem permissão',
+      );
+    }
+
+    return { message: 'Tarefa removida com sucesso' };
   }
 }

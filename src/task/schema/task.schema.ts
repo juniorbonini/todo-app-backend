@@ -11,7 +11,7 @@ export class Task extends Document {
   title: string;
 
   @Prop({ default: false })
-  isCompletd: boolean;
+  isCompleted: boolean;
 
   @Prop()
   description: string;
