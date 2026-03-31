@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
-import { AuthService } from './auth/service/auth.service';
-import { AuthController } from './auth/controller/auth.controller';
+import { JwtService } from '@nestjs/jwt';
+import { AuthModule } from '@/auth/auth.module';
+import { UserModule } from '@/user/user.module';
 
 const URI =
   'mongodb+srv://todo-app:todoappapplication@todoapp.yle10an.mongodb.net/';
@@ -20,7 +19,6 @@ const URI =
     UserModule,
     AuthModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
+  providers: [JwtService],
 })
 export class AppModule {}
