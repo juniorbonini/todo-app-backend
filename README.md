@@ -59,8 +59,10 @@ O projeto segue uma estrutura baseada em boas práticas do NestJS:
 ```
 src/
  ├── auth/
- ├── user/
+ ├── interface/
+ ├── jwt/
  ├── task/
+ ├── user/
  └── app.module.ts
 ```
 
