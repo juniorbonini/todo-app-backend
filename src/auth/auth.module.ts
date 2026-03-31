@@ -5,8 +5,9 @@ import { AuthService } from './service/auth.service';
 import { AuthController } from './controller/auth.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from '@/jwt/jwt.strategy';
 
-const JWT_SECRET = 'jwt-scret-key';
+export const JWT_SECRET = 'jwt-secret-key';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ const JWT_SECRET = 'jwt-scret-key';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
+  exports: [AuthService, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}
