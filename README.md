@@ -30,7 +30,7 @@ O foco deste projeto não é apenas "fazer funcionar", mas sim:
 
 ## 📌 O que está sendo desenvolvido
 
-### 🔐 Autenticação (em desenvolvimento)
+### 🔐 Autenticação
 
 * [x] Estrutura inicial do backend
 * [x] Conexão com banco de dados
@@ -44,8 +44,8 @@ O foco deste projeto não é apenas "fazer funcionar", mas sim:
 
 ### ✅ Futuras implementações
 
-* CRUD de tarefas (Tasks)
-* Associação de tarefas com usuário
+* [X] CRUD de tarefas (Tasks)
+* [X] Associação de tarefas com usuário
 * Estatísticas de produtividade
 * Possível sistema de gamificação
 * Containerização com Docker
@@ -60,6 +60,7 @@ O projeto segue uma estrutura baseada em boas práticas do NestJS:
 src/
  ├── auth/
  ├── user/
+ ├── task/
  └── app.module.ts
 ```
 
