@@ -48,4 +48,17 @@ export class TaskService {
 
     return { message: 'Tarefa removida com sucesso' };
   }
+
+  async getTaskStats(userId: string) {
+    const totalCreated = await this.taskModel.countDocuments({ userId });
+    const totalCompleted = await this.taskModel.countDocuments({
+      userId,
+      isCompleted: true,
+    });
+
+    return [
+      { type: 'created', value: totalCreated },
+      { type: 'completd', value: totalCompleted },
+    ];
+  }
 }

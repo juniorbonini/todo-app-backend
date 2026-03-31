@@ -32,6 +32,11 @@ export class TaskController {
     return this.taskService.findAllByUserId(user.userId);
   }
 
+  @Get('stats')
+  async getStats(@currentUser() user: any) {
+    return this.taskService.getTaskStats(user);
+  }
+
   @Patch(':id/toggle')
   async toggle(@Param('id') id: string, @currentUser() user: any) {
     return this.taskService.toggleStatus(id, user);
