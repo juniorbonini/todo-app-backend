@@ -1,11 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateTaskDTO } from '../dto/task.dto';
-import { currentUser } from '@/auth/decorators/current-user.decoratos';
-import { TaskService } from '../service/task.service';
 
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { currentUser } from '@/auth/decorators/current-user.decoratos';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { CreateTaskDTO } from '../dto/task.dto';
+import { Task } from '../schema/task.schema';
+import { TaskService } from '../service/task.service';
+import { JwtAuthGuard } from '@/jwt/jwt-auth.guard';
+
+@UseGuards(JwtAuthGuard)
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}
@@ -16,7 +19,7 @@ export class TaskController {
   }
 
   @Get()
-  findAll(@currentUser() user: any) {
-    return this.taskService.findAll(user.userId);
+  findAllByUserId(@currentUser() user: any): Promise<Task[]> {
+    return this.taskService.findAllByUserId(user.userId);
   }
 }
