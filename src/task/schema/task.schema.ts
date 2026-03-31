@@ -8,7 +8,7 @@ import { Document, Types } from 'mongoose';
 })
 export class Task extends Document {
   @Prop({ required: true })
-  tile: string;
+  title: string;
 
   @Prop({ default: false })
   isCompletd: boolean;
