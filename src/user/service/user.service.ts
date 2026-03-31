@@ -1,23 +1,25 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import * as bcrypt from 'bcrypt';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 
+import { RegisterDTO } from '@/auth/dto/register.dto';
 import {
   CreateUserDTO,
   UpdateUserDTO,
   UserResponseDTO,
 } from '@/user/dto/user.dto';
 import { User, UserDocument } from '@/user/schemas/user.schema';
-import { RegisterDTO } from '@/auth/dto/register.dto';
 
 @Injectable()
 export class UserService {

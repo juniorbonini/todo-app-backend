@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   Body,
   Controller,
@@ -7,15 +6,15 @@ import {
   Param,
   Post,
   Put,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 
-import { JwtAuthGuard } from '@/jwt/jwt-auth.guard';
+import { currentUser } from '@/auth/decorators/current.user.decoratos';
 import { RegisterDTO } from '@/auth/dto/register.dto';
-import { UserService } from '@/user/service/user.service';
+import type { ActiveUser } from '@/interfaces/active.user';
+import { JwtAuthGuard } from '@/jwt/jwt.auth.guard';
 import { CreateUserDTO, UpdateUserDTO } from '@/user/dto/user.dto';
-import { currentUser } from '@/auth/decorators/current-user.decoratos';
+import { UserService } from '@/user/service/user.service';
 
 @Controller('users')
 export class UserController {
@@ -34,7 +33,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('current')
-  getCurrent(@currentUser() user: any) {
+  getCurrent(@currentUser() user: ActiveUser) {
     return user;
   }
 
