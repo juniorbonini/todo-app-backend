@@ -28,7 +28,7 @@ export class UserService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  private responseDTO(user: any): UserResponseDTO {
+  public toResponseDTO(user: UserDocument): UserResponseDTO {
     return {
       id: user._id.toString(),
       name: user.name,
@@ -40,7 +40,7 @@ export class UserService {
     try {
       const user = await this.userModel.create(dto);
 
-      return this.responseDTO(user);
+      return this.toResponseDTO(user);
     } catch (error) {
       if (error.code === 11000) {
         throw new BadRequestException('E-mail já está em uso.');
@@ -52,7 +52,7 @@ export class UserService {
   async findAll(): Promise<UserResponseDTO[]> {
     const user = await this.userModel.find();
 
-    return user.map((user) => this.responseDTO(user));
+    return user.map((user) => this.toResponseDTO(user));
   }
 
   async findById(id: string): Promise<UserResponseDTO> {
@@ -66,7 +66,11 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
-    const user = await this.userModel.findOne({ email });
+    return this.userModel.findOne({ email });
+  }
+
+  async findByEmailOrThrow(email: string): Promise<UserDocument> {
+    const user = await this.findByEmail(email);
 
     if (!user) {
       throw new NotFoundException('Usuário não encontrado');

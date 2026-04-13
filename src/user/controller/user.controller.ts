@@ -40,7 +40,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('email/:email')
   findByEmail(@Param('email') email: string) {
-    return this.userService.findByEmail(email);
+    return this.userService.findByEmailOrThrow(email);
   }
 
   @UseGuards(JwtAuthGuard)
