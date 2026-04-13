@@ -1,23 +1,30 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+import { AuthService } from '@/auth/service/auth.service';
+import { UserService } from '@/user/service/user.service';
+import { expect } from '@jest/globals';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getModelToken } from '@nestjs/mongoose';
-import { UserService } from './user.service';
-import { User } from '../schemas/user.schema';
+import { beforeEach, describe, it } from 'node:test';
 
-describe('UserService', () => {
-  let service: UserService;
+describe('AuthService', () => {
+  let service: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UserService,
+        AuthService,
         {
-          provide: getModelToken(User.name),
+          provide: UserService,
+          useValue: {},
+        },
+        {
+          provide: JwtService,
           useValue: {},
         },
       ],
     }).compile();
 
-    service = module.get<UserService>(UserService);
+    service = module.get<AuthService>(AuthService);
   });
 
   it('should be defined', () => {

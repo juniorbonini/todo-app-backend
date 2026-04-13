@@ -1,22 +1,25 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
+import { AuthController } from '@/auth/controller/auth.controller';
+import { AuthService } from '@/auth/service/auth.service';
+import { expect } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from '../service/user.service';
-import { UserController } from './user.controller';
+import { beforeEach, describe, it } from 'node:test';
 
-describe('UserController', () => {
-  let controller: UserController;
+describe('AuthController', () => {
+  let controller: AuthController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [UserController],
+      controllers: [AuthController],
       providers: [
         {
-          provide: UserService,
+          provide: AuthService,
           useValue: {},
         },
       ],
     }).compile();
 
-    controller = module.get<UserController>(UserController);
+    controller = module.get<AuthController>(AuthController);
   });
 
   it('should be defined', () => {
