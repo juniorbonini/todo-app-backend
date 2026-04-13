@@ -39,7 +39,7 @@ export class UserService {
       const user = await this.userModel.create(dto);
 
       return this.toResponseDTO(user);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 11000) {
         throw new BadRequestException('E-mail já está em uso.');
       }
@@ -88,7 +88,7 @@ export class UserService {
       }
 
       return new UserResponseDTO(user);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 11000) {
         throw new BadRequestException('E-mail já está em uso.');
       }
@@ -115,7 +115,7 @@ export class UserService {
       const savedUser = await user.save();
 
       return new UserResponseDTO(savedUser);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 11000) {
         throw new BadRequestException('E-mail já está em uso.');
       }

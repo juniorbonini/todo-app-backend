@@ -1,70 +1,133 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
+
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards,
+  BadRequestException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 
-import { currentUser } from '@/auth/decorators/current.user.decoratos';
 import { RegisterDTO } from '@/auth/dto/register.dto';
-import type { ActiveUser } from '@/interfaces/active.user';
-import { JwtAuthGuard } from '@/jwt/jwt.auth.guard';
-import { CreateUserDTO, UpdateUserDTO } from '@/user/dto/user.dto';
-import { UserService } from '@/user/service/user.service';
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  UserResponseDTO,
+} from '@/user/dto/user.dto';
+import { User, UserDocument } from '@/user/schemas/user.schema';
 
-@Controller('users')
-export class UserController {
-  constructor(private userService: UserService) {}
+@Injectable()
+export class UserService {
+  constructor(
+    @InjectModel(User.name)
+    private userModel: Model<UserDocument>,
+  ) {}
 
-  @Post()
-  create(@Body() dto: CreateUserDTO) {
-    return this.userService.create(dto);
+  public toResponseDTO(user: UserDocument): UserResponseDTO {
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+    };
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  async create(dto: CreateUserDTO) {
+    try {
+      const user = await this.userModel.create(dto);
+
+      return this.toResponseDTO(user);
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new BadRequestException('E-mail já está em uso.');
+      }
+      throw error;
+    }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('current')
-  getCurrent(@currentUser() user: ActiveUser) {
+  async findAll(): Promise<UserResponseDTO[]> {
+    const user = await this.userModel.find();
+
+    return user.map((user) => this.toResponseDTO(user));
+  }
+
+  async findById(id: string): Promise<UserResponseDTO> {
+    const user = await this.userModel.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    return new UserResponseDTO(user);
+  }
+
+  async findByEmail(email: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ email });
+  }
+
+  async findByEmailOrThrow(email: string): Promise<UserDocument> {
+    const user = await this.findByEmail(email);
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
     return user;
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('email/:email')
-  findByEmail(@Param('email') email: string) {
-    return this.userService.findByEmailOrThrow(email);
+  async update(id: string, dto: UpdateUserDTO): Promise<UserResponseDTO> {
+    try {
+      const user = await this.userModel.findByIdAndUpdate(id, dto, {
+        new: true,
+      });
+
+      if (!user) {
+        throw new NotFoundException('Usuário não encontrado.');
+      }
+
+      return new UserResponseDTO(user);
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new BadRequestException('E-mail já está em uso.');
+      }
+      return error;
+    }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findById(@Param('id') id: string) {
-    return this.userService.findById(id);
+  async register(registerDTO: RegisterDTO): Promise<UserResponseDTO> {
+    const { password, confirmPassword, ...userData } = registerDTO;
+
+    if (password !== confirmPassword) {
+      throw new BadRequestException('As senhas não coincidem.');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    try {
+      const user = new this.userModel({
+        ...userData,
+        password: hashedPassword,
+      });
+
+      const savedUser = await user.save();
+
+      return new UserResponseDTO(savedUser);
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new BadRequestException('E-mail já está em uso.');
+      }
+      throw error;
+    }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateUserDTO) {
-    return this.userService.update(id, dto);
-  }
+  async delete(id: string): Promise<void> {
+    const result = await this.userModel.findByIdAndDelete(id);
 
-  @Post('register')
-  register(@Body() registerDTO: RegisterDTO) {
-    return this.userService.register(registerDTO);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.userService.delete(id);
+    if (!result) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
   }
 }
