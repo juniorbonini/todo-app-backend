@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../service/auth.service';
 import { AuthController } from './auth.controller';
+import { expect } from '@jest/globals';
+import { beforeEach, describe, it } from 'node:test';
 
 describe('AuthController', () => {
   let controller: AuthController;

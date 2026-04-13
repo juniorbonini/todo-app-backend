@@ -1,7 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from '@nestjs/jwt';
-import { AuthService } from './auth.service';
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { UserService } from '@/user/service/user.service';
+import { expect } from '@jest/globals';
+import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import { beforeEach, describe, it } from 'node:test';
+import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
