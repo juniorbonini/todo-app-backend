@@ -4,6 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+import { successResponse } from '@/scripts/api-response';
 import { UserService } from '@/user/service/user.service';
 
 @Injectable()
@@ -17,13 +18,21 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('Credenciais inválidas');
+      throw new UnauthorizedException({
+        status: 'error',
+        message: 'Credenciais inválidas.',
+        code: 'AUTH_INVALID_CREDENTIALS',
+      });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciais inválidas');
+      throw new UnauthorizedException({
+        status: 'error',
+        message: 'Credenciais inválidas.',
+        code: 'AUTH_INVALID_CREDENTIALS',
+      });
     }
 
     const payload = {
@@ -31,9 +40,9 @@ export class AuthService {
       sub: user?._id.toString(),
     };
 
-    return {
+    return successResponse('Login realizado com sucesso.', 'AUTH_LOGIN_SUCCESS', {
       token: this.jwtService.sign(payload),
       user: this.userService.toResponseDTO(user),
-    };
+    });
   }
 }

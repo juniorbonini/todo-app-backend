@@ -12,6 +12,8 @@ import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 
 import { RegisterDTO } from '@/auth/dto/register.dto';
+import type { ApiSuccessResponse } from '@/interfaces/api-response';
+import { successResponse } from '@/scripts/api-response';
 import {
   CreateUserDTO,
   UpdateUserDTO,
@@ -38,10 +40,17 @@ export class UserService {
     try {
       const user = await this.userModel.create(dto);
 
-      return this.toResponseDTO(user);
+      return successResponse('Usuário criado com sucesso.', 'USER_CREATED', {
+        user: this.toResponseDTO(user),
+      });
     } catch (error: any) {
       if (error.code === 11000) {
-        throw new BadRequestException('E-mail já está em uso.');
+        throw new BadRequestException({
+          status: 'error',
+          message: 'E-mail já está em uso.',
+          code: 'USER_EMAIL_IN_USE',
+          field: 'email',
+        });
       }
       throw error;
     }
@@ -57,7 +66,11 @@ export class UserService {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException({
+        status: 'error',
+        message: 'Usuário não encontrado.',
+        code: 'USER_NOT_FOUND',
+      });
     }
 
     return new UserResponseDTO(user);
@@ -71,7 +84,11 @@ export class UserService {
     const user = await this.findByEmail(email);
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException({
+        status: 'error',
+        message: 'Usuário não encontrado.',
+        code: 'USER_NOT_FOUND',
+      });
     }
 
     return user;
@@ -84,23 +101,39 @@ export class UserService {
       });
 
       if (!user) {
-        throw new NotFoundException('Usuário não encontrado.');
+        throw new NotFoundException({
+          status: 'error',
+          message: 'Usuário não encontrado.',
+          code: 'USER_NOT_FOUND',
+        });
       }
 
       return new UserResponseDTO(user);
     } catch (error: any) {
       if (error.code === 11000) {
-        throw new BadRequestException('E-mail já está em uso.');
+        throw new BadRequestException({
+          status: 'error',
+          message: 'E-mail já está em uso.',
+          code: 'USER_EMAIL_IN_USE',
+          field: 'email',
+        });
       }
       return error;
     }
   }
 
-  async register(registerDTO: RegisterDTO): Promise<UserResponseDTO> {
+  async register(
+    registerDTO: RegisterDTO,
+  ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
     const { password, confirmPassword, ...userData } = registerDTO;
 
     if (password !== confirmPassword) {
-      throw new BadRequestException('As senhas não coincidem.');
+      throw new BadRequestException({
+        status: 'error',
+        message: 'As senhas não coincidem.',
+        code: 'USER_PASSWORD_MISMATCH',
+        field: 'confirmPassword',
+      });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -114,10 +147,19 @@ export class UserService {
 
       const savedUser = await user.save();
 
-      return new UserResponseDTO(savedUser);
+      return successResponse(
+        'Cadastro realizado com sucesso.',
+        'AUTH_REGISTER_SUCCESS',
+        { user: new UserResponseDTO(savedUser) },
+      );
     } catch (error: any) {
       if (error.code === 11000) {
-        throw new BadRequestException('E-mail já está em uso.');
+        throw new BadRequestException({
+          status: 'error',
+          message: 'E-mail já está em uso.',
+          code: 'USER_EMAIL_IN_USE',
+          field: 'email',
+        });
       }
       throw error;
     }
@@ -127,7 +169,11 @@ export class UserService {
     const result = await this.userModel.findByIdAndDelete(id);
 
     if (!result) {
-      throw new NotFoundException('Usuário não encontrado.');
+      throw new NotFoundException({
+        status: 'error',
+        message: 'Usuário não encontrado.',
+        code: 'USER_NOT_FOUND',
+      });
     }
   }
 }
