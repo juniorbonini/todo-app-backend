@@ -1,12 +1,20 @@
-import { Type } from 'class-transformer';
-import { IsNotEmpty, IsEmail, IsDate, IsNumber } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsNotEmpty, IsEmail, IsDate, IsNumber, Validate } from 'class-validator';
+
+import { IsDeliverableEmailValidator } from '@/auth/validators/is-deliverable-email.validator';
 
 export class RegisterDTO {
   @IsNotEmpty({ message: 'O nome é obrigatório' })
   name: string;
 
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.trim().toLowerCase() : value,
+  )
   @IsNotEmpty({ message: 'O E-mail é obrigatório' })
   @IsEmail({}, { message: 'E-mail inválido' })
+  @Validate(IsDeliverableEmailValidator, {
+    message: 'O e-mail informado não pertence a um provedor válido.',
+  })
   email: string;
 
   @IsNotEmpty({ message: 'A senha é obrigatória' })
