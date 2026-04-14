@@ -13,6 +13,7 @@ import { currentUser } from '@/auth/decorators/current.user.decoratos';
 import { RegisterDTO } from '@/auth/dto/register.dto';
 import type { ActiveUser } from '@/interfaces/active.user';
 import { JwtAuthGuard } from '@/jwt/jwt.auth.guard';
+import { successResponse } from '@/scripts/api-response';
 import { CreateUserDTO, UpdateUserDTO } from '@/user/dto/user.dto';
 import { UserService } from '@/user/service/user.service';
 
@@ -34,7 +35,9 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('current')
   getCurrent(@currentUser() user: ActiveUser) {
-    return user;
+    return successResponse('Usuário autenticado carregado com sucesso.', 'USER_CURRENT_FETCHED', {
+      user,
+    });
   }
 
   @UseGuards(JwtAuthGuard)

@@ -59,7 +59,9 @@ export class UserService {
   async findAll(): Promise<UserResponseDTO[]> {
     const user = await this.userModel.find();
 
-    return user.map((user) => this.toResponseDTO(user));
+    return successResponse('Usuários carregados com sucesso.', 'USERS_LISTED', {
+      users: user.map((currentUser) => this.toResponseDTO(currentUser)),
+    }) as unknown as UserResponseDTO[];
   }
 
   async findById(id: string): Promise<UserResponseDTO> {
@@ -73,7 +75,9 @@ export class UserService {
       });
     }
 
-    return new UserResponseDTO(user);
+    return successResponse('Usuário carregado com sucesso.', 'USER_FETCHED', {
+      user: new UserResponseDTO(user),
+    }) as unknown as UserResponseDTO;
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
@@ -108,7 +112,11 @@ export class UserService {
         });
       }
 
-      return new UserResponseDTO(user);
+      return successResponse(
+        'Usuário atualizado com sucesso.',
+        'USER_UPDATED',
+        { user: new UserResponseDTO(user) },
+      ) as unknown as UserResponseDTO;
     } catch (error: any) {
       if (error.code === 11000) {
         throw new BadRequestException({
@@ -165,7 +173,7 @@ export class UserService {
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string) {
     const result = await this.userModel.findByIdAndDelete(id);
 
     if (!result) {
@@ -175,5 +183,7 @@ export class UserService {
         code: 'USER_NOT_FOUND',
       });
     }
+
+    return successResponse('Usuário removido com sucesso.', 'USER_REMOVED', {});
   }
 }
