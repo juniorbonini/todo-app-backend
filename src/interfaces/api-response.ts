@@ -1,3 +1,9 @@
+export interface ApiFieldError {
+  field: string;
+  message: string;
+  code: string;
+}
+
 export interface ApiSuccessResponse<T> {
   status: 'success';
   message: string;
@@ -10,4 +16,5 @@ export interface ApiErrorResponse {
   message: string;
   code: string;
   field?: string;
+  errors?: ApiFieldError[];
 }

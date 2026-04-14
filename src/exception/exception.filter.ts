@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-import type { ApiErrorResponse } from '@/interfaces/api-response';
+import type { ApiErrorResponse, ApiFieldError } from '@/interfaces/api-response';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -27,6 +27,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             message?: string | string[];
             code?: string;
             field?: string;
+            errors?: ApiFieldError[];
             status?: 'error';
           };
 
@@ -48,6 +49,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       if (typeof exceptionResponse !== 'string' && exceptionResponse.field) {
         responseBody.field = exceptionResponse.field;
+      }
+
+      if (typeof exceptionResponse !== 'string' && exceptionResponse.errors) {
+        responseBody.errors = exceptionResponse.errors;
       }
 
       response.status(status).json(responseBody);
