@@ -1,7 +1,9 @@
-import { Transform, Type } from 'class-transformer';
-import { IsNotEmpty, IsEmail, IsDate, IsNumber, Validate } from 'class-validator';
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { Transform } from 'class-transformer';
+import { IsEmail, IsNotEmpty, Validate } from 'class-validator';
 
 import { IsDeliverableEmailValidator } from '@/auth/validators/is-deliverable-email.validator';
+import { IsValidBirthDateValidator } from '@/auth/validators/is-valid-birth-date.validator';
 
 export class RegisterDTO {
   @IsNotEmpty({ message: 'O nome é obrigatório' })
@@ -24,15 +26,9 @@ export class RegisterDTO {
   confirmPassword: string;
 
   @IsNotEmpty({ message: 'A data de nascimento é obrigatória' })
-  @Type(() => Date)
-  @IsDate({ message: 'Data de nascimento inválida' })
-  birthDate: Date;
+  @Validate(IsValidBirthDateValidator)
+  birthDate: string;
 
   @IsNotEmpty({ message: 'O gênero é obrigatório' })
   gender: string;
-
-  @IsNotEmpty({ message: 'A idade é obrigatória' })
-  @IsNumber({}, { message: 'Idade inválida' })
-  @Type(() => Number)
-  age: number;
 }

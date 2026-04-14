@@ -36,6 +36,27 @@ export class UserService {
     };
   }
 
+  private parseBirthDate(birthDate: string) {
+    const [day, month, year] = birthDate.split('/').map(Number);
+
+    return new Date(year, month - 1, day);
+  }
+
+  private calculateAge(birthDate: Date) {
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age -= 1;
+    }
+
+    return age;
+  }
+
   async create(dto: CreateUserDTO) {
     try {
       const user = await this.userModel.create(dto);
@@ -133,7 +154,7 @@ export class UserService {
   async register(
     registerDTO: RegisterDTO,
   ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
-    const { password, confirmPassword, ...userData } = registerDTO;
+    const { password, confirmPassword, birthDate, ...userData } = registerDTO;
 
     if (password !== confirmPassword) {
       throw new BadRequestException({
@@ -146,10 +167,14 @@ export class UserService {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    const parsedBirthDate = this.parseBirthDate(birthDate);
+    const age = this.calculateAge(parsedBirthDate);
 
     try {
       const user = new this.userModel({
         ...userData,
+        birthDate: parsedBirthDate,
+        age,
         password: hashedPassword,
       });
 
