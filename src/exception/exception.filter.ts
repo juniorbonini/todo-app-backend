@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 import {
   ArgumentsHost,
   Catch,
@@ -11,7 +9,10 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 
-import type { ApiErrorResponse, ApiFieldError } from '@/interfaces/api-response';
+import type {
+  ApiErrorResponse,
+  ApiFieldError,
+} from '@/interfaces/api-response';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

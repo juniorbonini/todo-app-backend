@@ -35,9 +35,13 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('current')
   getCurrent(@currentUser() user: ActiveUser) {
-    return successResponse('Usuário autenticado carregado com sucesso.', 'USER_CURRENT_FETCHED', {
-      user,
-    });
+    return successResponse(
+      'Usuário autenticado carregado com sucesso.',
+      'USER_CURRENT_FETCHED',
+      {
+        user,
+      },
+    );
   }
 
   @UseGuards(JwtAuthGuard)

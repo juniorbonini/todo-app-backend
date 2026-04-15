@@ -44,7 +44,7 @@ export class IsValidBirthDateValidator implements ValidatorConstraintInterface {
     );
 
     if (birthDate >= todayAtMidnight) {
-      this.errorMessage = 'A data de nascimento não pode ser hoje ou futura.';
+      this.errorMessage = 'Data de nascimento inválida.';
       return false;
     }
 

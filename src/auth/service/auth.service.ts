@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
+import { LoginDTO } from '@/auth/dto/login.dto';
 import { successResponse } from '@/scripts/api-response';
 import { UserService } from '@/user/service/user.service';
 
@@ -14,8 +13,8 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
+  async login(loginDTO: LoginDTO) {
+    const user = await this.userService.findByEmail(loginDTO.email);
 
     if (!user) {
       throw new UnauthorizedException({
@@ -25,7 +24,10 @@ export class AuthService {
       });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginDTO.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException({
@@ -40,9 +42,13 @@ export class AuthService {
       sub: user?._id.toString(),
     };
 
-    return successResponse('Login realizado com sucesso.', 'AUTH_LOGIN_SUCCESS', {
-      token: this.jwtService.sign(payload),
-      user: this.userService.toResponseDTO(user),
-    });
+    return successResponse(
+      'Login realizado com sucesso.',
+      'AUTH_LOGIN_SUCCESS',
+      {
+        token: this.jwtService.sign(payload),
+        user: this.userService.toResponseDTO(user),
+      },
+    );
   }
 }

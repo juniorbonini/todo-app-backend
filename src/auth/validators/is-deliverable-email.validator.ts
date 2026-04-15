@@ -6,9 +6,7 @@ import {
 } from 'class-validator';
 
 @ValidatorConstraint({ name: 'isDeliverableEmail', async: true })
-export class IsDeliverableEmailValidator
-  implements ValidatorConstraintInterface
-{
+export class IsDeliverableEmailValidator implements ValidatorConstraintInterface {
   async validate(email: string) {
     if (!email || typeof email !== 'string') {
       return false;
@@ -49,6 +47,6 @@ export class IsDeliverableEmailValidator
   }
 
   defaultMessage() {
-    return 'O e-mail informado não pertence a um provedor válido.';
+    return 'O e-mail é inválido.';
   }
 }
