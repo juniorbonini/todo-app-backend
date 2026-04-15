@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 
-import { UserModule } from 'src/user/user.module';
-import { AuthService } from './service/auth.service';
-import { AuthController } from './controller/auth.controller';
-import { PassportModule } from '@nestjs/passport';
-import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '@/jwt/jwt.strategy';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { UserModule } from 'src/user/user.module';
+import { AuthController } from './controller/auth.controller';
+import { AuthService } from './service/auth.service';
 import { IsDeliverableEmailValidator } from './validators/is-deliverable-email.validator';
+import { MailService } from '@/mailservice/service/mailservice.service';
 
 export const JWT_SECRET = 'jwt-secret-key';
 
@@ -20,7 +21,12 @@ export const JWT_SECRET = 'jwt-secret-key';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, IsDeliverableEmailValidator],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    IsDeliverableEmailValidator,
+    MailService,
+  ],
   exports: [AuthService, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}

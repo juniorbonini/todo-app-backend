@@ -151,6 +151,13 @@ export class UserService {
     }
   }
 
+  async updateResetCode(id: string | undefined, code: string, expires: Date) {
+    await this.userModel.findByIdAndUpdate(id, {
+      resetCode: code,
+      resetCodeExpires: expires,
+    });
+  }
+
   async register(
     registerDTO: RegisterDTO,
   ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
