@@ -74,4 +74,32 @@ describe('Fluxo de esqueci minha senha (e2e)', () => {
 
     await expect(authService.verifyCode(email, '000000')).rejects.toThrow();
   });
+
+  it('deve atualizar a senha do usuário com suecesso e limpar o código de reset', async () => {
+    const email = 'la.boninijunior@gmail.com';
+    const code = '123456';
+    const newPassword = 'MinhaSenhaNova';
+    const mockUser = {
+      _id: { toString: () => '1' },
+      email,
+      resetCode: code,
+      resetCodeExpires: new Date(Date.now() + 100000),
+    };
+
+    jest
+      .spyOn(userService, 'findByEmailOrThrow')
+      .mockResolvedValue(mockUser as any);
+    jest.spyOn(userService, 'updateResetCode').mockResolvedValue({} as any);
+    jest.spyOn(userService, 'updatePassword').mockResolvedValue({} as any);
+
+    const result = await authService.resetPassword(email, code, newPassword);
+
+    expect(result.code).toBe('AUTH_PASSWORD_RESET');
+
+    expect(userService.updatePassword).toHaveBeenCalledWith(
+      '1',
+      expect.any(String),
+    );
+    expect(userService.updateResetCode).toHaveBeenCalledWith('1', null, null);
+  });
 });
