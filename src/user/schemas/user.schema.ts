@@ -20,6 +20,15 @@ export class User {
 
   @Prop({ required: true })
   age: number;
+
+  @Prop({ default: false })
+  isVerified: boolean;
+
+  @Prop({ type: String, default: null })
+  verificationToken: string | null;
+
+  @Prop({ type: Date, default: null })
+  resetPasswordExpires: Date | null;
 }
 
 export type UserDocument = User & Document;
