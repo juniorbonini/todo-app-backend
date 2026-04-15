@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { randomInt } from 'crypto';
-import { JwtService } from '@nestjs/jwt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { LoginDTO } from '@/auth/dto/login.dto';
+import { MailService } from '@/mailservice/service/mail.service';
 import { successResponse } from '@/scripts/api-response';
 import { UserService } from '@/user/service/user.service';
-import { MailService } from '@/mailservice/service/mailservice.service';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,13 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
   ) {}
+
+  verifyCode(email: string, code: string) {
+    throw new Error('Method not implemented.');
+  }
+  resetPassword(email: string, code: string, newPassword: string) {
+    throw new Error('Method not implemented.');
+  }
 
   async login(loginDTO: LoginDTO) {
     const user = await this.userService.findByEmail(loginDTO.email);

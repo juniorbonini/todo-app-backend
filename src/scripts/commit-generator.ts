@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { exec } from 'child_process';
 import dotenv from 'dotenv';
 import { Groq } from 'groq-sdk';
@@ -11,8 +8,6 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const execPromise = util.promisify(exec);
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
-console.log('Chave carregada:', process.env.GROQ_API_KEY ? 'SIM' : 'NÃO');
 
 async function run() {
   try {

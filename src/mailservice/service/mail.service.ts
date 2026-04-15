@@ -28,11 +28,13 @@ export class MailService {
   }
 
   async sendVerificationCode(email: string, code: string) {
-    await this.resend.emails.send({
-      from: 'Ascending Time Forge <onboarding.resend.dev>',
+    const result = await this.resend.emails.send({
+      from: 'onboarding@resend.dev',
       to: email,
       subject: 'Seu código da verificação',
       html: `<strong>Seu código é: ${code}</strong>. Ele expira em 15 minutos`,
     });
+
+    return result;
   }
 }

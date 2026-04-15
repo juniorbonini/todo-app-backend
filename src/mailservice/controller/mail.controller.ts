@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
@@ -9,9 +10,9 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { CreateMailserviceDto } from './dto/create-mailservice.dto';
-import { UpdateMailserviceDto } from './dto/update-mailservice.dto';
-import { MailService } from './mailservice.service';
+import { CreateMailserviceDto } from '../dto/create-mailservice.dto';
+import { UpdateMailserviceDto } from '../dto/update-mailservice.dto';
+import { MailService } from '../service/mail.service';
 
 @Controller('mailservice')
 export class MailserviceController {

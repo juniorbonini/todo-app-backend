@@ -5,7 +5,7 @@ import { AuthModule } from '@/auth/auth.module';
 import { UserModule } from '@/user/user.module';
 import { JwtService } from '@nestjs/jwt';
 import { TaskModule } from './task/task.module';
-import { MailserviceModule } from './mailservice/mailservice.module';
+import { MailserviceModule } from './mailservice/mail.module';
 
 const URI =
   'mongodb+srv://todo-app:todoappapplication@todoapp.yle10an.mongodb.net/';
