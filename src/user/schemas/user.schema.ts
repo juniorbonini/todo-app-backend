@@ -25,10 +25,10 @@ export class User {
   isVerified: boolean;
 
   @Prop({ type: String, default: null })
-  verificationToken: string | null;
+  resetCode: string | null;
 
-  @Prop({ type: Date, default: null })
-  resetPasswordExpires: Date | null;
+  @Prop({ type: Date })
+  resetCodeExpires: Date;
 }
 
 export type UserDocument = User & Document;

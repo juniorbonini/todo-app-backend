@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { randomInt } from 'crypto';
@@ -17,11 +23,59 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
-  verifyCode(email: string, code: string) {
-    throw new Error('Method not implemented.');
+  async verifyCode(email: string, code: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new UnauthorizedException({
+        status: 'error',
+        message: 'Usuário não encontrado',
+        code: 'USER_NOT_FOUND',
+      });
+    }
   }
-  resetPassword(email: string, code: string, newPassword: string) {
-    throw new Error('Method not implemented.');
+
+  async resetPassword(email: string, code: string, newPassword: string) {
+    const user = await this.userService.findByEmailOrThrow(email);
+
+    if (user.resetCode !== code || new Date() > user.resetCodeExpires) {
+      throw new BadRequestException({
+        status: 'error',
+        message: 'Código inválido ou expirado',
+        code: 'AUTH_INVALID_RESET_CODE',
+      });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await this.userService.updatePassword(user._id.toString(), hashedPassword);
+    await this.userService.updateResetCode(user._id.toString(), null, null);
+
+    return successResponse(
+      'Senha alterada com sucesso',
+      'AUTH_PASSWORD_RESET',
+      {},
+    );
+  }
+  async forgotPassword(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      return successResponse(
+        'Se o e-mail existir o código será enviado!',
+        'AUTH_SENT_CODE',
+        {},
+      );
+    }
+
+    const code = randomInt(100000 * 90000).toString();
+    const expires = new Date();
+    expires.setMinutes(expires.getMinutes() + 15);
+
+    await this.userService.updateResetCode(user._id.toString(), code, expires);
+    await this.mailService.sendVerificationCode(email, code);
+
+    return successResponse('Código enviado com sucesso!', 'AUTH_SENT_CODE', {});
   }
 
   async login(loginDTO: LoginDTO) {
@@ -67,12 +121,10 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     const code = randomInt(100000, 999999).toString();
-
     const expires = new Date();
     expires.setMinutes(expires.getMinutes() + 15);
 
     await this.userService.updateResetCode(user?._id.toString(), code, expires);
-
     await this.mailService.sendVerificationCode(email, code);
 
     return successResponse(

@@ -151,10 +151,20 @@ export class UserService {
     }
   }
 
-  async updateResetCode(id: string | undefined, code: string, expires: Date) {
+  async updateResetCode(
+    id: string | undefined,
+    code: string | null,
+    expires: Date | null,
+  ) {
     await this.userModel.findByIdAndUpdate(id, {
       resetCode: code,
       resetCodeExpires: expires,
+    });
+  }
+
+  async updatePassword(id: string, newPassword: string) {
+    await this.userModel.findByIdAndUpdate(id, {
+      password: newPassword,
     });
   }
 
