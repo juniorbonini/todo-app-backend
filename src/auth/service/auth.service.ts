@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
   Injectable,
@@ -24,15 +21,21 @@ export class AuthService {
   ) {}
 
   async verifyCode(email: string, code: string) {
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userService.findByEmailOrThrow(email);
 
-    if (!user) {
-      throw new UnauthorizedException({
+    if (user.resetCode !== code || new Date() > user.resetCodeExpires) {
+      throw new BadRequestException({
         status: 'error',
-        message: 'Usuário não encontrado',
-        code: 'USER_NOT_FOUND',
+        message: 'Código inválido ou expirado.',
+        code: 'AUTH_INVALID_RESET_CODE',
       });
     }
+
+    return successResponse(
+      'Código validado com sucesso.',
+      'AUTH_CODE_VALID',
+      {},
+    );
   }
 
   async resetPassword(email: string, code: string, newPassword: string) {
