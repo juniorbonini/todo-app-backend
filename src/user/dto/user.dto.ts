@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { UserDocument } from '../schemas/user.schema';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { UserDocument } from '../schemas/user.schema';
 
 export class UserResponseDTO {
   id: string;
@@ -24,7 +24,7 @@ export class UserResponseDTO {
     this.createdAt = (user as any).createdAt;
   }
 }
-export class updateUserDTO {
+export class UpdateUserDTO {
   @IsOptional()
   @IsString({ message: 'O nome deve ser um texto' })
   @IsNotEmpty({ message: 'O nome não pode ser vazio' })

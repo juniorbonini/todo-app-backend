@@ -11,7 +11,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { updateUserDTO, UserResponseDTO } from '../dto/user.dto';
+import { UpdateUserDTO, UserResponseDTO } from '../dto/user.dto';
 import { User, UserDocument } from '../schemas/user.schema';
 
 @Injectable()
@@ -141,7 +141,7 @@ export class UserService {
   }
 
   async update(
-    dto: updateUserDTO,
+    dto: UpdateUserDTO,
     userId: string,
   ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
     await this.findByIdOrThrow(userId);

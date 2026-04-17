@@ -1,75 +1,25 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
-
 import { currentUser } from '@/auth/decorators/current.user.decoratos';
-import { RegisterDTO } from '@/auth/dto/register.dto';
 import type { ActiveUser } from '@/interfaces/active.user';
-import { JwtAuthGuard } from '@/jwt/jwt.auth.guard';
-import { successResponse } from '@/scripts/api-response';
-import { CreateUserDTO, UpdateUserDTO } from '@/user/dto/user.dto';
+import { UpdateUserDTO } from '@/user/dto/user.dto';
 import { UserService } from '@/user/service/user.service';
+import { Body, Controller, Delete, Get, Put } from '@nestjs/common';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post()
-  create(@Body() dto: CreateUserDTO) {
-    return this.userService.create(dto);
+  @Get('me')
+  getMe(@currentUser() user: ActiveUser) {
+    return this.userService.findById(user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Put('me')
+  updateMe(@currentUser() user: ActiveUser, @Body() dto: UpdateUserDTO) {
+    return this.userService.update(user.id, dto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('current')
-  getCurrent(@currentUser() user: ActiveUser) {
-    return successResponse(
-      'Usuário autenticado carregado com sucesso.',
-      'USER_CURRENT_FETCHED',
-      {
-        user,
-      },
-    );
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('email/:email')
-  findByEmail(@Param('email') email: string) {
-    return this.userService.findByEmailOrThrow(email);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  findById(@Param('id') id: string) {
-    return this.userService.findById(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateUserDTO) {
-    return this.userService.update(id, dto);
-  }
-
-  @Post('register')
-  register(@Body() registerDTO: RegisterDTO) {
-    return this.userService.register(registerDTO);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.userService.delete(id);
+  @Delete('me')
+  deleteMe(@currentUser() user: ActiveUser) {
+    return this.userService.delete(user.id);
   }
 }
