@@ -93,7 +93,7 @@ export class UserService {
     );
   }
 
-  async crete(
+  async create(
     dto: RegisterDTO,
   ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
     const { password, confirmPassword, birthDate, ...userData } = dto;
@@ -166,7 +166,7 @@ export class UserService {
     }
   }
 
-  async updateReseCode(
+  async updateResetCode(
     id: string,
     code: string | null,
     expires: Date | null,
