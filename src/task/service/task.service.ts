@@ -90,9 +90,10 @@ export class TaskService {
 
     const isCompleting = !task.isCompleted;
     const completedAt = isCompleting ? new Date() : null;
-    const xpEarned = isCompleting
-      ? this.calculateXpEarned(task, completedAt)
-      : null;
+    const xpEarned =
+      isCompleting && completedAt
+        ? this.calculateXpEarned(task, completedAt)
+        : null;
 
     task.isCompleted = isCompleting;
     task.completedAt = completedAt;

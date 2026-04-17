@@ -1,5 +1,7 @@
 import { currentUser } from '@/auth/decorators/current.user.decoratos';
-import { JwtAuthGuard } from '@/jwt/jwt.auth.guard';
+import type { ActiveUser } from '@/interfaces/active.user';
+import { CreateTaskDTO, UpdateTaskDTO } from '@/task/dto/task.dto';
+import { TaskService } from '@/task/service/task.service';
 import {
   Body,
   Controller,
@@ -8,15 +10,9 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
+  Put,
 } from '@nestjs/common';
 
-import type { ActiveUser } from '@/interfaces/active.user';
-import { CreateTaskDTO } from '@/task/dto/task.dto';
-import { Task } from '@/task/schema/task.schema';
-import { TaskService } from '@/task/service/task.service';
-
-@UseGuards(JwtAuthGuard)
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}
@@ -27,22 +23,31 @@ export class TaskController {
   }
 
   @Get()
-  findAllByUserId(@currentUser() user: ActiveUser): Promise<Task[]> {
-    return this.taskService.findAllByUserId(user.id);
+  findAll(@currentUser() user: ActiveUser) {
+    return this.taskService.findByUserId(user.id);
   }
 
   @Get('stats')
-  async getStats(@currentUser() user: ActiveUser) {
-    return this.taskService.getTaskStats(user.id);
+  getStats(@currentUser() user: ActiveUser) {
+    return this.taskService.getTasksStats(user.id);
   }
 
-  @Patch(':id/toggle')
-  async toggle(@Param('id') id: string, @currentUser() user: ActiveUser) {
+  @Put(':id')
+  update(
+    @Body() dto: UpdateTaskDTO,
+    @currentUser() user: ActiveUser,
+    @Param('id') id: string,
+  ) {
+    return this.taskService.update(user.id, id, dto);
+  }
+
+  @Patch('id')
+  toggle(@Param('id') id: string, @currentUser() user: ActiveUser) {
     return this.taskService.toggleStatus(id, user.id);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @currentUser() user: ActiveUser) {
+  delete(@Param() id: string, @currentUser() user: ActiveUser) {
     return this.taskService.remove(id, user.id);
   }
 }
