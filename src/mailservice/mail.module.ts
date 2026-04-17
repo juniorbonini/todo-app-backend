@@ -7,5 +7,6 @@ import { MailService } from './service/mail.service';
   imports: [ConfigModule.forRoot({ envFilePath: '.env' })],
   controllers: [MailserviceController],
   providers: [MailService],
+  exports: [MailService],
 })
 export class MailserviceModule {}
