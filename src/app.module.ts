@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 
-import { AuthModule } from '@/auth/auth.module';
 import { UserModule } from '@/user/user.module';
-import { JwtService } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
 import { TaskModule } from './task/task.module';
 import { MailserviceModule } from './mailservice/mail.module';
 

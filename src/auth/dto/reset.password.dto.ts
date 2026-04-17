@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, Length, MinLength } from 'class-validator';
 
 export class ResetPasswordDTO {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))

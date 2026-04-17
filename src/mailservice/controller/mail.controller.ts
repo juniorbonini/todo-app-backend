@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 
 import { VerifyCodeDTO } from '@/auth/dto/verify.code.dto';
-import { MailService } from '../service/mail.service';
+import { MailService } from '@/mailservice/service/mail.service';
 
 @Controller('mailservice')
 export class MailserviceController {

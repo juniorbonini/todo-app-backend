@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
-import { RegisterDTO } from '@/auth/dto/register.dto';
-import { ApiSuccessResponse } from '@/interfaces/api-response';
-import { successResponse } from '@/scripts/api-response';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-import { UpdateUserDTO, UserResponseDTO } from '../dto/user.dto';
-import { User, UserDocument } from '../schemas/user.schema';
+import * as bcrypt from 'bcrypt';
+import { InjectModel } from '@nestjs/mongoose';
+
+import { RegisterDTO } from '@/auth/dto/register.dto';
+import { successResponse } from '@/scripts/api-response';
+import { ApiSuccessResponse } from '@/interfaces/api-response';
+import { User, UserDocument } from '@/user/schemas/user.schema';
+import { UpdateUserDTO, UserResponseDTO } from '@/user/dto/user.dto';
 
 @Injectable()
 export class UserService {

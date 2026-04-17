@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { ApiSuccessResponse } from '@/interfaces/api-response';
-import { successResponse } from '@/scripts/api-response';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateTaskDTO, UpdateTaskDTO } from '../dto/task.dto';
-import { Task, TaskDocument, xpTaskByPriority } from '../schema/task.schema';
+
+import { successResponse } from '@/scripts/api-response';
+import { ApiSuccessResponse } from '@/interfaces/api-response';
+import { CreateTaskDTO, UpdateTaskDTO } from '@/task/dto/task.dto';
+import {
+  Task,
+  TaskDocument,
+  xpTaskByPriority,
+} from '@/task/schema/task.schema';
 
 @Injectable()
 export class TaskService {

@@ -7,7 +7,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
-import type { TaskPriority } from '../schema/task.schema';
+import type { TaskPriority } from '@/task/schema/task.schema';
 
 export class CreateTaskDTO {
   @IsString()

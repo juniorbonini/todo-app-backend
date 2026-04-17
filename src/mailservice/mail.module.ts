@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MailserviceController } from './controller/mail.controller';
+
 import { MailService } from './service/mail.service';
+import { MailserviceController } from './controller/mail.controller';
 
 @Module({
   imports: [ConfigModule.forRoot({ envFilePath: '.env' })],

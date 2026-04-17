@@ -1,12 +1,13 @@
-import { JwtStrategy } from '@/jwt/jwt.strategy';
-import { MailserviceModule } from '@/mailservice/mail.module';
-import { UserModule } from '@/user/user.module';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from '@/jwt/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { AuthController } from './controller/auth.controller';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { UserModule } from '@/user/user.module';
 import { AuthService } from './service/auth.service';
+import { MailserviceModule } from '@/mailservice/mail.module';
+import { AuthController } from './controller/auth.controller';
 import { IsDeliverableEmailValidator } from './validators/is-deliverable-email.validator';
 
 @Module({
@@ -27,4 +28,4 @@ import { IsDeliverableEmailValidator } from './validators/is-deliverable-email.v
   providers: [AuthService, JwtStrategy, IsDeliverableEmailValidator],
   exports: [AuthService, JwtStrategy, PassportModule, JwtModule],
 })
-export class AuthMode {}
+export class AuthModule {}

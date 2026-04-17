@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 
 export class VerifyCodeDTO {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
@@ -9,6 +10,6 @@ export class VerifyCodeDTO {
   email: string;
 
   @IsNotEmpty({ message: 'O código é obrigatório' })
-  @MinLength(6, { message: 'O código deve ter exatamente 6 dígitos' })
+  @Length(6)
   code: string;
 }

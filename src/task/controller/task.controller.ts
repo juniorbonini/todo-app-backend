@@ -1,7 +1,3 @@
-import { currentUser } from '@/auth/decorators/current.user.decoratos';
-import type { ActiveUser } from '@/interfaces/active.user';
-import { CreateTaskDTO, UpdateTaskDTO } from '@/task/dto/task.dto';
-import { TaskService } from '@/task/service/task.service';
 import {
   Body,
   Controller,
@@ -12,6 +8,11 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+
+import { TaskService } from '@/task/service/task.service';
+import type { ActiveUser } from '@/interfaces/active.user';
+import { CreateTaskDTO, UpdateTaskDTO } from '@/task/dto/task.dto';
+import { currentUser } from '@/auth/decorators/current.user.decoratos';
 
 @Controller('tasks')
 export class TaskController {

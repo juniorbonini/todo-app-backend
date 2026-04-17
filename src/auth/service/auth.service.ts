@@ -3,16 +3,16 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
+import { randomInt } from 'crypto';
+import { JwtService } from '@nestjs/jwt';
 
 import { LoginDTO } from '@/auth/dto/login.dto';
-import { MailService } from '@/mailservice/service/mail.service';
+import { RegisterDTO } from '@/auth/dto/register.dto';
 import { successResponse } from '@/scripts/api-response';
-import { UserDocument } from '@/user/schemas/user.schema';
 import { UserService } from '@/user/service/user.service';
-import { randomInt } from 'crypto';
-import { RegisterDTO } from '../dto/register.dto';
+import { UserDocument } from '@/user/schemas/user.schema';
+import { MailService } from '@/mailservice/service/mail.service';
 
 @Injectable()
 export class AuthService {
