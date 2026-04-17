@@ -24,13 +24,10 @@ export class Task extends Document {
   priority: TaskPriority;
 
   @Prop({ type: Date, default: null })
-  completdAt: Date | null;
+  completedAt: Date | null;
 
   @Prop({ required: true, min: 1 })
   timeLimit: number;
-
-  @Prop({ default: false })
-  isCompleted: boolean;
 
   @Prop({ type: Number, default: null })
   xpEarned: number | null;
