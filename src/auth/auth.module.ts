@@ -14,6 +14,7 @@ import { IsDeliverableEmailValidator } from './validators/is-deliverable-email.v
   imports: [
     UserModule,
     PassportModule,
+    ConfigModule,
     MailserviceModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
