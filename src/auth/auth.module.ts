@@ -1,32 +1,30 @@
-import { Module } from '@nestjs/common';
-
 import { JwtStrategy } from '@/jwt/jwt.strategy';
-import { MailService } from '@/mailservice/service/mail.service';
+import { MailserviceModule } from '@/mailservice/mail.module';
+import { UserModule } from '@/user/user.module';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { UserModule } from 'src/user/user.module';
 import { AuthController } from './controller/auth.controller';
 import { AuthService } from './service/auth.service';
 import { IsDeliverableEmailValidator } from './validators/is-deliverable-email.validator';
-
-export const JWT_SECRET = 'jwt-secret-key';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
-    JwtModule.register({
-      secret: JWT_SECRET,
-      signOptions: { expiresIn: '2h' },
+    MailserviceModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '1h' },
+      }),
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    IsDeliverableEmailValidator,
-    MailService,
-  ],
+  providers: [AuthService, JwtStrategy, IsDeliverableEmailValidator],
   exports: [AuthService, JwtStrategy, PassportModule, JwtModule],
 })
-export class AuthModule {}
+export class AuthMode {}
