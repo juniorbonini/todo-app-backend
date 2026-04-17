@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const secret = config.get<string>('JWT_SECRET');
 
     if (!secret) {
-      throw new Error('JWT_SECRET must be defined');
+      throw new Error('JWT_SECRET deve existir');
     }
 
     super({
