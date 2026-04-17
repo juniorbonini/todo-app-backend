@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
+import { RegisterDTO } from '@/auth/dto/register.dto';
+import { ApiSuccessResponse } from '@/interfaces/api-response';
+import { successResponse } from '@/scripts/api-response';
 import {
   BadRequestException,
   Injectable,
@@ -10,16 +11,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
-
-import { RegisterDTO } from '@/auth/dto/register.dto';
-import type { ApiSuccessResponse } from '@/interfaces/api-response';
-import { successResponse } from '@/scripts/api-response';
-import {
-  CreateUserDTO,
-  UpdateUserDTO,
-  UserResponseDTO,
-} from '@/user/dto/user.dto';
-import { User, UserDocument } from '@/user/schemas/user.schema';
+import { updateUserDTO, UserResponseDTO } from '../dto/user.dto';
+import { User, UserDocument } from '../schemas/user.schema';
 
 @Injectable()
 export class UserService {
@@ -28,77 +21,36 @@ export class UserService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  public toResponseDTO(user: UserDocument): UserResponseDTO {
-    return {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-    };
+  toResponseDTO(user: UserDocument): UserResponseDTO {
+    return new UserResponseDTO(user);
   }
 
-  private parseBirthDate(birthDate: string) {
+  private parseBirthDate(birthDate: string): Date {
     const [day, month, year] = birthDate.split('/').map(Number);
-
     return new Date(year, month - 1, day);
   }
 
-  private calculateAge(birthDate: Date) {
+  private calculateAge(birthDate: Date): number {
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
 
     if (
-      monthDifference < 0 ||
-      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
     ) {
       age -= 1;
     }
-
     return age;
   }
 
-  async create(dto: CreateUserDTO) {
-    try {
-      const user = await this.userModel.create(dto);
-
-      return successResponse('Usuário criado com sucesso.', 'USER_CREATED', {
-        user: this.toResponseDTO(user),
-      });
-    } catch (error: any) {
-      if (error.code === 11000) {
-        throw new BadRequestException({
-          status: 'error',
-          message: 'E-mail já está em uso.',
-          code: 'USER_EMAIL_IN_USE',
-          field: 'email',
-        });
-      }
-      throw error;
-    }
-  }
-
-  async findAll(): Promise<UserResponseDTO[]> {
-    const user = await this.userModel.find();
-
-    return successResponse('Usuários carregados com sucesso.', 'USERS_LISTED', {
-      users: user.map((currentUser) => this.toResponseDTO(currentUser)),
-    }) as unknown as UserResponseDTO[];
-  }
-
-  async findById(id: string): Promise<UserResponseDTO> {
+  private async findByIdOrThrow(id: string): Promise<UserDocument> {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException({
-        status: 'error',
-        message: 'Usuário não encontrado.',
-        code: 'USER_NOT_FOUND',
-      });
+      throw new Error('Usuário não encontrado');
     }
-
-    return successResponse('Usuário carregado com sucesso.', 'USER_FETCHED', {
-      user: new UserResponseDTO(user),
-    }) as unknown as UserResponseDTO;
+    return user;
   }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
@@ -111,7 +63,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException({
         status: 'error',
-        message: 'Usuário não encontrado.',
+        message: 'Usuário não encontrado',
         code: 'USER_NOT_FOUND',
       });
     }
@@ -119,94 +71,67 @@ export class UserService {
     return user;
   }
 
-  async update(id: string, dto: UpdateUserDTO): Promise<UserResponseDTO> {
-    try {
-      const user = await this.userModel.findByIdAndUpdate(id, dto, {
-        new: true,
-      });
-
-      if (!user) {
-        throw new NotFoundException({
-          status: 'error',
-          message: 'Usuário não encontrado.',
-          code: 'USER_NOT_FOUND',
-        });
-      }
-
-      return successResponse(
-        'Usuário atualizado com sucesso.',
-        'USER_UPDATED',
-        { user: new UserResponseDTO(user) },
-      ) as unknown as UserResponseDTO;
-    } catch (error: any) {
-      if (error.code === 11000) {
-        throw new BadRequestException({
-          status: 'error',
-          message: 'E-mail já está em uso.',
-          code: 'USER_EMAIL_IN_USE',
-          field: 'email',
-        });
-      }
-      return error;
-    }
-  }
-
-  async updateResetCode(
-    id: string | undefined,
-    code: string | null,
-    expires: Date | null,
-  ) {
-    await this.userModel.findByIdAndUpdate(id, {
-      resetCode: code,
-      resetCodeExpires: expires,
-    });
-  }
-
-  async updatePassword(id: string, newPassword: string) {
-    await this.userModel.findByIdAndUpdate(id, {
-      password: newPassword,
-    });
-  }
-
-  async register(
-    registerDTO: RegisterDTO,
+  async findById(
+    id: string,
   ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
-    const { password, confirmPassword, birthDate, ...userData } = registerDTO;
+    const user = await this.findByIdOrThrow(id);
+
+    return successResponse('Usuário encontrado com sucesso', 'USER_LOADED', {
+      user: this.toResponseDTO(user),
+    });
+  }
+
+  async findAll(): Promise<ApiSuccessResponse<{ user: UserResponseDTO[] }>> {
+    const users = await this.userModel.find();
+
+    return successResponse(
+      'Usuários carregados com sucesso',
+      'USER_LIST_LOADED',
+      {
+        user: users.map((user) => this.toResponseDTO(user)),
+      },
+    );
+  }
+
+  async crete(
+    dto: RegisterDTO,
+  ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
+    const { password, confirmPassword, birthDate, ...userData } = dto;
 
     if (password !== confirmPassword) {
       throw new BadRequestException({
         status: 'error',
-        message: 'As senhas não coincidem.',
-        code: 'USER_PASSWORD_MISMATCH',
+        message: 'As senhas não coincidem',
+        code: 'PASSWORDS_DO_NOT_MATCH',
         field: 'confirmPassword',
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
     const parsedBirthDate = this.parseBirthDate(birthDate);
     const age = this.calculateAge(parsedBirthDate);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
-      const user = new this.userModel({
+      const user = await this.userModel.create({
         ...userData,
         birthDate: parsedBirthDate,
         age,
         password: hashedPassword,
+        isVerified: false,
       });
 
-      const savedUser = await user.save();
-
       return successResponse(
-        'Cadastro realizado com sucesso.',
+        'Usuário criado com suecesso',
         'AUTH_REGISTER_SUCCESS',
-        { user: new UserResponseDTO(savedUser) },
+        {
+          user: this.toResponseDTO(user),
+        },
       );
     } catch (error: any) {
       if (error.code === 11000) {
         throw new BadRequestException({
           status: 'error',
-          message: 'E-mail já está em uso.',
+          message: 'O e-mail já está em uso',
           code: 'USER_EMAIL_IN_USE',
           field: 'email',
         });
@@ -215,17 +140,53 @@ export class UserService {
     }
   }
 
-  async delete(id: string) {
-    const result = await this.userModel.findByIdAndDelete(id);
+  async update(
+    dto: updateUserDTO,
+    userId: string,
+  ): Promise<ApiSuccessResponse<{ user: UserResponseDTO }>> {
+    await this.findByIdOrThrow(userId);
 
-    if (!result) {
-      throw new NotFoundException({
-        status: 'error',
-        message: 'Usuário não encontrado.',
-        code: 'USER_NOT_FOUND',
+    try {
+      const user = await this.userModel.findByIdAndUpdate(userId, dto, {
+        new: true,
       });
+      return successResponse('Usuário atualizado com sucesso', 'USER_UPDATED', {
+        user: this.toResponseDTO(user!),
+      });
+    } catch (error: any) {
+      if (error.code === 11000) {
+        throw new BadRequestException({
+          status: 'error',
+          message: 'O e-mail já está em uso',
+          code: 'USER_EMAIL_IN_USE',
+          field: 'email',
+        });
+      }
+      throw error;
     }
+  }
 
-    return successResponse('Usuário removido com sucesso.', 'USER_REMOVED', {});
+  async updateReseCode(
+    id: string,
+    code: string | null,
+    expires: Date | null,
+  ): Promise<void> {
+    await this.userModel.findByIdAndUpdate(id, {
+      resetCode: code,
+      resetCodeExpires: expires,
+    });
+  }
+
+  async updatePassword(id: string, newPassword: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(id, {
+      password: newPassword,
+    });
+  }
+
+  async delete(id: string): Promise<ApiSuccessResponse<object>> {
+    await this.findByIdOrThrow(id);
+    await this.userModel.findByIdAndDelete(id);
+
+    return successResponse('Usuário removido com sucesso', 'USER_REMOVED', {});
   }
 }
