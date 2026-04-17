@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
   name: string;
@@ -28,7 +28,7 @@ export class User {
   resetCode: string | null;
 
   @Prop({ type: Date })
-  resetCodeExpires: Date;
+  resetCodeExpires: Date | null;
 }
 
 export type UserDocument = User & Document;

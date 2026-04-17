@@ -9,6 +9,8 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 const execPromise = util.promisify(exec);
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+console.log('A KEY DO GROQ É:', process.env.GROQ_API_KEY);
+
 async function run() {
   try {
     const { stdout: files } = await execPromise('git diff --name-only');

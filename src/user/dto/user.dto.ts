@@ -1,47 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { UserDocument } from '../schemas/user.schema';
-
-export class CreateUserDTO {
-  @IsNotEmpty({ message: 'O nome é obrigatório' })
-  name: string;
-
-  @IsEmail({}, { message: 'E-mail inválido' })
-  email: string;
-
-  @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres' })
-  password: string;
-}
 
 export class UserResponseDTO {
   id: string;
   name: string;
   email: string;
+  birthDate: Date;
+  gender: string;
+  age: number;
+  isVerified: boolean;
+  createdAt?: Date;
 
   constructor(user: UserDocument) {
-    ((this.id = user._id.toString()),
-      (this.name = user.name),
-      (this.email = user.email));
+    this.id = user._id.toString();
+    this.name = user.name;
+    this.email = user.email;
+    this.birthDate = user.birthDate;
+    this.gender = user.gender;
+    this.age = user.age;
+    this.isVerified = user.isVerified;
+    this.createdAt = (user as any).createdAt;
   }
 }
-
-export class UpdateUserDTO {
-  @IsOptional()
+export class updateUserDTO {
+  @IsPotional()
   @IsString({ message: 'O nome deve ser um texto' })
+  @IsNotEmpty({ message: 'O nome não pode ser vazio' })
   name?: string;
-
-  @IsOptional()
-  @IsEmail({}, { message: 'Email inválido' })
-  email?: string;
-
-  @IsOptional()
-  @IsString({ message: 'A senha deve ser um texto' })
-  @MinLength(6, { message: 'A senha deve ter no mínimo 8 caracteres' })
-  password?: string;
 }
